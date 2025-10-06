@@ -1,6 +1,6 @@
 {
   "name": "ComfyUI-Ninode-Utils",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Utility nodes for ComfyUI including OpenAI Compatible Chat",
   "main": "nodes.py",
   "scripts": {

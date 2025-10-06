@@ -55,8 +55,8 @@ class OpenAICompatibleChatNode(ComfyNodeABC):
                 "api_url": (
                     IO.STRING,
                     {
-                        "default": "http://127.0.0.1:35841/v1/chat/completions",
-                        "tooltip": "OpenAI-compatible API endpoint URL (e.g., http://127.0.0.1:35841/v1/chat/completions for Lemonade, or http://localhost:11434/v1/chat/completions for Ollama)",
+                        "default": "http://127.0.0.1:8000/api/v1/chat/completions",
+                        "tooltip": "OpenAI-compatible API endpoint URL (e.g., http://127.0.0.1:8000/api/v1/chat/completions for Lemonade Server, or http://localhost:11434/v1/chat/completions for Ollama)",
                     },
                 ),
                 "model": (

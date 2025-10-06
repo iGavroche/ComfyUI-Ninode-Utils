@@ -13,7 +13,7 @@ A collection of utility nodes for ComfyUI, featuring OpenAI Compatible Chat func
 
 A flexible chat node that works with **any OpenAI-compatible API endpoint**, providing complete compatibility with the original ChatGPT node while supporting:
 
-- **Local servers** like Lemonade (`http://127.0.0.1:35841/v1/chat/completions`)
+- **Local servers** like [Lemonade Server](https://lemonade-server.ai/docs/server) (`http://127.0.0.1:8000/api/v1/chat/completions`)
 - **Ollama** (`http://localhost:11434/v1/chat/completions`)
 - **OpenAI API** (`https://api.openai.com/v1/chat/completions`)
 - **LM Studio** (`http://localhost:1234/v1/chat/completions`)

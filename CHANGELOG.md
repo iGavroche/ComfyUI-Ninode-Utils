@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.1] - 2024-12-19
+
+### Changed
+- Updated default API URL to Lemonade Server standard (`http://127.0.0.1:8000/api/v1/chat/completions`)
+- Added link to [Lemonade Server documentation](https://lemonade-server.ai/docs/server) in README
+- Updated tooltip to reference Lemonade Server instead of generic Lemonade
+
 ## [0.9.0] - 2024-12-19
 
 ### Added

@@ -1,7 +1,7 @@
 [project]
 name = "comfyui-ninode-utils"
 description = "Utility nodes for ComfyUI including OpenAI Compatible Chat - Works with any OpenAI-compatible API endpoint including Lemonade, Ollama, OpenAI API, and LM Studio"
-version = "0.9.0"
+version = "0.9.1"
 license = {file = "LICENSE"}
 dependencies = [
     "aiohttp>=3.8.0",
@@ -24,7 +24,7 @@ requires-comfyui = ">=1.0.0"
 name = "comfyui-ninode-utils"
 display_name = "ComfyUI Ninode Utils"
 description = "Utility nodes for ComfyUI including OpenAI Compatible Chat - Works with any OpenAI-compatible API endpoint"
-version = "0.9.0"
+version = "0.9.1"
 author = "iGavroche"
 author_email = "nino2k@proton.me"
 repository = "https://github.com/iGavroche/ComfyUI-Ninode-Utils"
