@@ -15,14 +15,14 @@ Repository = "https://github.com/iGavroche/ComfyUI-Ninode-Utils"
 
 [tool.comfy]
 PublisherId = "igavroche"
-DisplayName = "ComfyUI Ninode Utils"
+DisplayName = "Ninode Utils"
 Icon = "https://raw.githubusercontent.com/iGavroche/ComfyUI-Ninode-Utils/refs/heads/main/icon.svg"
 includes = ["nodes.py", "__init__.py"]
 requires-comfyui = ">=1.0.0"
 
 [tool.comfyui-manager]
 name = "comfyui-ninode-utils"
-display_name = "ComfyUI Ninode Utils"
+display_name = "Ninode Utils"
 description = "Utility nodes for ComfyUI including OpenAI Compatible Chat - Works with any OpenAI-compatible API endpoint"
 version = "0.9.1"
 author = "iGavroche"
