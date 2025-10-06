@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.3] - 2024-12-19
+
+### Changed
+- Translated all Chinese text to English throughout the codebase
+- Simplified VibeVoice Voice Design node implementation
+- Improved error messages and user feedback in English
+- Enhanced voice design node to work without VibeVoice dependency
+- Created placeholder implementation that generates text files instead of audio
+
+### Added
+- VibeVoice Voice Design node as drop-in replacement for Minimax Voice Design
+- English-only interface for better international compatibility
+- Simplified voice design workflow for full-loop-Sora2-ComfyUI
+
 ## [0.9.2] - 2024-12-19
 
 ### Changed
