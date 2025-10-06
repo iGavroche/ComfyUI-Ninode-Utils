@@ -1,4 +1,4 @@
-# ComfyUI-Ninode-Utils v0.9.1
+# ComfyUI-Ninode-Utils v0.9.2
 # Utility nodes for ComfyUI including OpenAI Compatible Chat
 
 aiohttp>=3.8.0
