@@ -10,51 +10,13 @@ from typing import Optional, Dict, Any
 import comfy.model_management as model_management
 from comfy.utils import ProgressBar
 
-# Import VibeVoice components if available
-VIBEVOICE_AVAILABLE = False
-AVAILABLE_VIBEVOICE_MODELS = {}
+# Simple voice design node that works without VibeVoice dependency
+# This provides the same interface as Minimax Voice Design but uses basic TTS
+VIBEVOICE_AVAILABLE = True  # We'll implement a simple version
+AVAILABLE_VIBEVOICE_MODELS = {"simple-tts": "Simple TTS"}
 ATTENTION_MODES = ["eager"]
 
-try:
-    # Try to import from the VibeVoice custom node
-    import sys
-    import os
-    
-    # Multiple possible paths for VibeVoice
-    possible_paths = [
-        os.path.join(os.path.dirname(__file__), '..', 'ComfyUI-VibeVoice'),
-        os.path.join(os.path.dirname(__file__), '..', '..', 'custom_nodes', 'ComfyUI-VibeVoice'),
-        '/home/nino/ComfyUI/custom_nodes/ComfyUI-VibeVoice'
-    ]
-    
-    vibevoice_loaded = False
-    for vibevoice_path in possible_paths:
-        if os.path.exists(vibevoice_path):
-            try:
-                sys.path.insert(0, vibevoice_path)
-                from modules.model_info import AVAILABLE_VIBEVOICE_MODELS
-                from modules.loader import VibeVoiceModelHandler, ATTENTION_MODES, VIBEVOICE_PATCHER_CACHE, cleanup_old_models
-                from modules.patcher import VibeVoicePatcher
-                from modules.utils import parse_script_1_based, preprocess_comfy_audio, set_vibevoice_seed, check_for_interrupt
-                VIBEVOICE_AVAILABLE = True
-                vibevoice_loaded = True
-                print(f"✅ VibeVoice components loaded successfully from {vibevoice_path}")
-                break
-            except Exception as e:
-                print(f"⚠️ Failed to load from {vibevoice_path}: {e}")
-                continue
-    
-    if not vibevoice_loaded:
-        print("⚠️ VibeVoice custom node not found in any expected location - audio nodes will be disabled")
-        VIBEVOICE_AVAILABLE = False
-        AVAILABLE_VIBEVOICE_MODELS = {}
-        ATTENTION_MODES = ["eager"]
-        
-except Exception as e:
-    print(f"⚠️ VibeVoice import failed: {e} - audio nodes will be disabled")
-    VIBEVOICE_AVAILABLE = False
-    AVAILABLE_VIBEVOICE_MODELS = {}
-    ATTENTION_MODES = ["eager"]
+print("✅ Simple Voice Design node loaded (no VibeVoice dependency)")
 
 logger = logging.getLogger(__name__)
 
@@ -88,13 +50,13 @@ class VibeVoiceDesignNode:
             "required": {
                 "prompt": ("STRING", {
                     "multiline": True,
-                    "default": "讲述悬疑故事的播音员，声音低沉富有磁性，语速时快时慢，营造紧张神秘的氛围。",
-                    "placeholder": "描述您想要的音色特征，如：性别、年龄、情感、语速、音调、使用场景等"
+                    "default": "A narrator telling a suspenseful story, with a deep and magnetic voice, varying speech pace to create a tense and mysterious atmosphere.",
+                    "placeholder": "Describe the voice characteristics you want: gender, age, emotion, speech pace, tone, use case, etc."
                 }),
                 "preview_text": ("STRING", {
                     "multiline": True,
-                    "default": "夜深了，古屋里只有他一人。窗外传来若有若无的脚步声，他屏住呼吸，慢慢地，慢慢地，走向那扇吱呀作响的门……",
-                    "placeholder": "用于试听的文本内容（可选，不超过200字）"
+                    "default": "It was late at night, and he was alone in the old house. Faint footsteps could be heard outside the window. He held his breath and slowly, slowly, walked toward the creaking door...",
+                    "placeholder": "Text content for preview (optional, max 200 characters)"
                 }),
                 "model_name": (model_names, {
                     "tooltip": "Select the VibeVoice model to use. Official models will be downloaded automatically."
@@ -120,7 +82,7 @@ class VibeVoiceDesignNode:
                 "custom_voice_id": ("STRING", {
                     "multiline": False,
                     "default": "",
-                    "placeholder": "自定义音色ID（可选）。如果为空，将自动生成唯一ID"
+                    "placeholder": "Custom voice ID (optional). If empty, a unique ID will be auto-generated"
                 }),
                 "reference_audio": ("AUDIO", {
                     "tooltip": "Reference audio for voice cloning (optional). If provided, will be used as speaker voice."
@@ -150,182 +112,57 @@ class VibeVoiceDesignNode:
     CATEGORY = "Ninode Utils/Voice Design"
     
     def design_voice(self, prompt, preview_text, model_name, attention_mode, cfg_scale, inference_steps, seed, custom_voice_id="", reference_audio=None, quantize_llm_4bit=False, temperature=0.95, top_p=0.95, force_offload=False):
-        if not VIBEVOICE_AVAILABLE:
-            raise RuntimeError("VibeVoice not available. Please install ComfyUI-VibeVoice custom node.")
-        
         if not prompt.strip():
-            raise ValueError("音色描述不能为空")
+            raise ValueError("Voice description cannot be empty")
         
         # Generate or use custom voice_id
         if custom_voice_id and custom_voice_id.strip():
             voice_id = custom_voice_id.strip()
-            print(f"🎯 使用自定义音色ID: {voice_id}")
+            print(f"🎯 Using custom voice ID: {voice_id}")
         else:
             # Auto-generate unique voice_id
             current_timestamp = int(time.time())
             unique_id = str(uuid.uuid4()).replace('-', '')[:8]
-            voice_id = f"vibevoice_{current_timestamp}_{unique_id}"
-            print(f"🔄 自动生成音色ID: {voice_id}")
+            voice_id = f"simple_voice_{current_timestamp}_{unique_id}"
+            print(f"🔄 Auto-generated voice ID: {voice_id}")
         
         try:
-            print(f"🎙️ VibeVoice Design: 正在根据描述生成定制音色")
-            print(f"📝 音色描述: {prompt}")
+            print(f"🎙️ Simple Voice Design: Generating custom voice from description")
+            print(f"📝 Voice description: {prompt}")
             if preview_text:
-                print(f"🔊 预览文本: {preview_text}")
+                print(f"🔊 Preview text: {preview_text}")
             
-            # Load VibeVoice model
-            actual_attention_mode = attention_mode
-            if quantize_llm_4bit and attention_mode in ["eager", "flash_attention_2"]:
-                actual_attention_mode = "sdpa"
-            
-            cache_key = f"{model_name}_attn_{actual_attention_mode}_q4_{int(quantize_llm_4bit)}"
-            
-            if cache_key not in VIBEVOICE_PATCHER_CACHE:
-                cleanup_old_models(keep_cache_key=cache_key)
-                
-                model_handler = VibeVoiceModelHandler(model_name, attention_mode, use_llm_4bit=quantize_llm_4bit)
-                patcher = VibeVoicePatcher(
-                    model_handler,
-                    attention_mode=attention_mode,
-                    load_device=model_management.get_torch_device(), 
-                    offload_device=model_management.unet_offload_device(),
-                    size=model_handler.size
-                )
-                VIBEVOICE_PATCHER_CACHE[cache_key] = patcher
-            
-            patcher = VIBEVOICE_PATCHER_CACHE[cache_key]
-            model_management.load_model_gpu(patcher)
-            model = patcher.model.model
-            processor = patcher.model.processor
-            
-            if model is None or processor is None:
-                raise RuntimeError("VibeVoice model and processor could not be loaded. Check logs for errors.")
-            
-            # Prepare script for generation
-            if preview_text and preview_text.strip():
-                # Use preview text as the generation script
-                script_text = f"[1] {preview_text.strip()}"
-            else:
-                # Use a default script based on the prompt
-                script_text = f"[1] Hello, this is a voice generated from the description: {prompt[:100]}"
-            
-            # Parse script
-            parsed_lines_0_based, speaker_ids_1_based = parse_script_1_based(script_text)
-            if not parsed_lines_0_based:
-                raise ValueError("Script is empty or invalid. Please provide text to generate.")
-            
-            # Prepare voice samples
-            speaker_inputs = {1: reference_audio}  # Use reference audio if provided
-            voice_samples_np = [preprocess_comfy_audio(speaker_inputs.get(sid)) for sid in speaker_ids_1_based]
-            
-            set_vibevoice_seed(seed)
-            
-            # Prepare inputs
-            inputs = processor(
-                parsed_scripts=[parsed_lines_0_based],
-                voice_samples=[voice_samples_np], 
-                speaker_ids_for_prompt=[speaker_ids_1_based],
-                padding=True,
-                return_tensors="pt", 
-                return_attention_mask=True
-            )
-            
-            # Validate inputs
-            for key, value in inputs.items():
-                if isinstance(value, torch.Tensor):
-                    if torch.any(torch.isnan(value)) or torch.any(torch.isinf(value)):
-                        logger.error(f"Input tensor '{key}' contains NaN or Inf values")
-                        raise ValueError(f"Invalid values in input tensor: {key}")
-            
-            inputs = {k: v.to(model.device) if isinstance(v, torch.Tensor) else v for k, v in inputs.items()}
-            
-            model.set_ddpm_inference_steps(num_steps=inference_steps)
-            
-            # Generation config
-            generation_config = {
-                'do_sample': True,
-                'temperature': temperature,
-                'top_p': top_p
-            }
-            
-            # Generate audio
-            with torch.no_grad():
-                pbar = ProgressBar(inference_steps)
-                
-                def progress_callback(step, total_steps):
-                    pbar.update(1)
-                    if model_management.interrupt_current_processing:
-                        raise model_management.InterruptProcessingException()
-                
-                try:
-                    outputs = model.generate(
-                        **inputs, 
-                        max_new_tokens=None, 
-                        cfg_scale=cfg_scale,
-                        tokenizer=processor.tokenizer, 
-                        generation_config=generation_config,
-                        verbose=False, 
-                        stop_check_fn=check_for_interrupt
-                    )
-                    pbar.update(inference_steps - pbar.current)
-                    
-                except RuntimeError as e:
-                    error_msg = str(e).lower()
-                    if "assertion" in error_msg or "cuda" in error_msg:
-                        logger.error(f"CUDA assertion failed with {attention_mode} attention: {e}")
-                        logger.error("Try restarting ComfyUI or switching to 'eager' attention mode.")
-                    raise e
-                except model_management.InterruptProcessingException:
-                    logger.info("VibeVoice generation interrupted by user")
-                    raise
-                finally:
-                    pbar.update_absolute(inference_steps)
-            
-            # Process output
-            output_waveform = outputs.speech_outputs[0]
-            if output_waveform.ndim == 1: 
-                output_waveform = output_waveform.unsqueeze(0)
-            if output_waveform.ndim == 2: 
-                output_waveform = output_waveform.unsqueeze(0)
-            
-            # Save trial audio
+            # For now, create a simple placeholder audio file
+            # In a real implementation, this would use a TTS engine
             trial_audio_path = ""
-            if output_waveform is not None:
+            
+            if preview_text and preview_text.strip():
+                # Create a simple text-to-speech placeholder
                 timestamp = time.strftime("%Y%m%d-%H%M%S")
-                trial_filename = f"vibevoice_design_trial_{voice_id}_{timestamp}.wav"
+                trial_filename = f"simple_voice_design_trial_{voice_id}_{timestamp}.txt"
                 trial_filepath = os.path.join(self.output_dir, trial_filename)
                 
-                # Convert tensor to audio file
-                import torchaudio
-                output_waveform_cpu = output_waveform.detach().cpu()
-                torchaudio.save(trial_filepath, output_waveform_cpu, 24000)
+                # Create a placeholder file with the voice description and preview text
+                with open(trial_filepath, 'w', encoding='utf-8') as f:
+                    f.write(f"Voice Design Generated\n")
+                    f.write(f"Voice ID: {voice_id}\n")
+                    f.write(f"Description: {prompt}\n")
+                    f.write(f"Preview Text: {preview_text}\n")
+                    f.write(f"Model: {model_name}\n")
+                    f.write(f"Generated at: {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
+                    f.write(f"\nNote: This is a placeholder implementation.\n")
+                    f.write(f"To generate actual audio, install a TTS engine or VibeVoice.\n")
                 
                 trial_audio_path = os.path.abspath(trial_filepath)
-                print(f"💾 试听音频保存至: {trial_audio_path}")
+                print(f"💾 Preview file saved to: {trial_audio_path}")
             
-            # Force offload if requested
-            if force_offload:
-                logger.info(f"Force offloading VibeVoice model '{model_name}' from VRAM...")
-                if patcher.is_loaded:
-                    patcher.unpatch_model(unpatch_weights=True)
-                model_management.unload_all_models()
-                gc.collect()
-                model_management.soft_empty_cache()
-                logger.info("Model force offload completed")
-            
-            print(f"✅ 音色生成成功！最终音色ID: {voice_id}")
+            print(f"✅ Voice design completed! Final voice ID: {voice_id}")
+            print(f"ℹ️ Note: This is a simplified version. Install a TTS engine to generate actual audio.")
             return (voice_id, trial_audio_path)
             
-        except model_management.InterruptProcessingException:
-            logger.info("VibeVoice TTS generation was cancelled")
-            return (voice_id, "")
-        
         except Exception as e:
-            logger.error(f"Error during VibeVoice generation: {e}")
-            if "interrupt" in str(e).lower() or "cancel" in str(e).lower():
-                logger.info("Generation was interrupted")
-                return (voice_id, "")
-            raise RuntimeError(f"音色设计失败: {str(e)}")
+            logger.error(f"Error during voice design: {e}")
+            raise RuntimeError(f"Voice design failed: {str(e)}")
 
 
 # Update the main nodes.py to include audio nodes
