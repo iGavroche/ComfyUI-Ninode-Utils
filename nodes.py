@@ -30,7 +30,7 @@ class OpenAICompatibleChatNode(ComfyNodeABC):
     """
 
     RETURN_TYPES = (IO.STRING,)
-    CATEGORY = "ComfyUI-Ninode-Utils/Chat"
+    CATEGORY = "Ninode Utils/Chat"
     DESCRIPTION = "OpenAI Compatible Chat Node - Works with any OpenAI-compatible API endpoint"
     FUNCTION = "api_call"
 
