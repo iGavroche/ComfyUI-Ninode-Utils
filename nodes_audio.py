@@ -19,17 +19,37 @@ try:
     # Try to import from the VibeVoice custom node
     import sys
     import os
-    vibevoice_path = os.path.join(os.path.dirname(__file__), '..', 'ComfyUI-VibeVoice')
-    if os.path.exists(vibevoice_path):
-        sys.path.insert(0, vibevoice_path)
-        from modules.model_info import AVAILABLE_VIBEVOICE_MODELS
-        from modules.loader import VibeVoiceModelHandler, ATTENTION_MODES, VIBEVOICE_PATCHER_CACHE, cleanup_old_models
-        from modules.patcher import VibeVoicePatcher
-        from modules.utils import parse_script_1_based, preprocess_comfy_audio, set_vibevoice_seed, check_for_interrupt
-        VIBEVOICE_AVAILABLE = True
-        print("✅ VibeVoice components loaded successfully")
-    else:
-        print("⚠️ VibeVoice custom node not found - audio nodes will be disabled")
+    
+    # Multiple possible paths for VibeVoice
+    possible_paths = [
+        os.path.join(os.path.dirname(__file__), '..', 'ComfyUI-VibeVoice'),
+        os.path.join(os.path.dirname(__file__), '..', '..', 'custom_nodes', 'ComfyUI-VibeVoice'),
+        '/home/nino/ComfyUI/custom_nodes/ComfyUI-VibeVoice'
+    ]
+    
+    vibevoice_loaded = False
+    for vibevoice_path in possible_paths:
+        if os.path.exists(vibevoice_path):
+            try:
+                sys.path.insert(0, vibevoice_path)
+                from modules.model_info import AVAILABLE_VIBEVOICE_MODELS
+                from modules.loader import VibeVoiceModelHandler, ATTENTION_MODES, VIBEVOICE_PATCHER_CACHE, cleanup_old_models
+                from modules.patcher import VibeVoicePatcher
+                from modules.utils import parse_script_1_based, preprocess_comfy_audio, set_vibevoice_seed, check_for_interrupt
+                VIBEVOICE_AVAILABLE = True
+                vibevoice_loaded = True
+                print(f"✅ VibeVoice components loaded successfully from {vibevoice_path}")
+                break
+            except Exception as e:
+                print(f"⚠️ Failed to load from {vibevoice_path}: {e}")
+                continue
+    
+    if not vibevoice_loaded:
+        print("⚠️ VibeVoice custom node not found in any expected location - audio nodes will be disabled")
+        VIBEVOICE_AVAILABLE = False
+        AVAILABLE_VIBEVOICE_MODELS = {}
+        ATTENTION_MODES = ["eager"]
+        
 except Exception as e:
     print(f"⚠️ VibeVoice import failed: {e} - audio nodes will be disabled")
     VIBEVOICE_AVAILABLE = False
@@ -311,11 +331,14 @@ class VibeVoiceDesignNode:
 # Update the main nodes.py to include audio nodes
 def get_audio_node_mappings():
     """Get audio node mappings for the audio-nodes branch"""
+    print(f"🔍 Audio nodes check: VIBEVOICE_AVAILABLE = {VIBEVOICE_AVAILABLE}")
     if VIBEVOICE_AVAILABLE:
+        print("✅ Adding VibeVoiceDesign node to mappings")
         return {
             "VibeVoiceDesign": VibeVoiceDesignNode,
         }
     else:
+        print("⚠️ VibeVoice not available, returning empty audio mappings")
         return {}
 
 def get_audio_display_name_mappings():
