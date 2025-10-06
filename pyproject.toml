@@ -26,3 +26,8 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["."]
+
+[tool.comfy]
+PublisherId = "" # TODO: Fill in your Publisher ID from Comfy Registry Website
+DisplayName = "ComfyUI Ninode Utils"
+Icon = "icon.svg"

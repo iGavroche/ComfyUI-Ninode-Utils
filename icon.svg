@@ -1,0 +1,26 @@
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="200" cy="200" r="180" fill="#1a1a1a" stroke="#4a9eff" stroke-width="8"/>
+  
+  <!-- Chat bubble -->
+  <rect x="80" y="120" width="200" height="120" rx="20" fill="#2d2d2d" stroke="#4a9eff" stroke-width="3"/>
+  
+  <!-- Chat bubble tail -->
+  <path d="M 120 240 L 100 260 L 140 240 Z" fill="#2d2d2d" stroke="#4a9eff" stroke-width="3"/>
+  
+  <!-- Text lines in chat -->
+  <rect x="100" y="150" width="120" height="8" rx="4" fill="#4a9eff"/>
+  <rect x="100" y="170" width="80" height="8" rx="4" fill="#4a9eff"/>
+  <rect x="100" y="190" width="100" height="8" rx="4" fill="#4a9eff"/>
+  
+  <!-- API symbol -->
+  <circle cx="300" cy="150" r="30" fill="none" stroke="#4a9eff" stroke-width="4"/>
+  <path d="M 280 150 L 300 130 L 320 150 L 300 170 Z" fill="#4a9eff"/>
+  
+  <!-- Network lines -->
+  <line x1="280" y1="150" x2="200" y2="150" stroke="#4a9eff" stroke-width="2"/>
+  <line x1="320" y1="150" x2="280" y2="150" stroke="#4a9eff" stroke-width="2"/>
+  
+  <!-- Utils text -->
+  <text x="200" y="320" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#4a9eff">UTILS</text>
+</svg>
