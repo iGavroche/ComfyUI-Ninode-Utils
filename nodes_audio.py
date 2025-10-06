@@ -11,13 +11,27 @@ import comfy.model_management as model_management
 from comfy.utils import ProgressBar
 
 # Import VibeVoice components if available
+VIBEVOICE_AVAILABLE = False
+AVAILABLE_VIBEVOICE_MODELS = {}
+ATTENTION_MODES = ["eager"]
+
 try:
-    from ComfyUI-VibeVoice.modules.model_info import AVAILABLE_VIBEVOICE_MODELS
-    from ComfyUI-VibeVoice.modules.loader import VibeVoiceModelHandler, ATTENTION_MODES, VIBEVOICE_PATCHER_CACHE, cleanup_old_models
-    from ComfyUI-VibeVoice.modules.patcher import VibeVoicePatcher
-    from ComfyUI-VibeVoice.modules.utils import parse_script_1_based, preprocess_comfy_audio, set_vibevoice_seed, check_for_interrupt
-    VIBEVOICE_AVAILABLE = True
-except ImportError:
+    # Try to import from the VibeVoice custom node
+    import sys
+    import os
+    vibevoice_path = os.path.join(os.path.dirname(__file__), '..', 'ComfyUI-VibeVoice')
+    if os.path.exists(vibevoice_path):
+        sys.path.insert(0, vibevoice_path)
+        from modules.model_info import AVAILABLE_VIBEVOICE_MODELS
+        from modules.loader import VibeVoiceModelHandler, ATTENTION_MODES, VIBEVOICE_PATCHER_CACHE, cleanup_old_models
+        from modules.patcher import VibeVoicePatcher
+        from modules.utils import parse_script_1_based, preprocess_comfy_audio, set_vibevoice_seed, check_for_interrupt
+        VIBEVOICE_AVAILABLE = True
+        print("✅ VibeVoice components loaded successfully")
+    else:
+        print("⚠️ VibeVoice custom node not found - audio nodes will be disabled")
+except Exception as e:
+    print(f"⚠️ VibeVoice import failed: {e} - audio nodes will be disabled")
     VIBEVOICE_AVAILABLE = False
     AVAILABLE_VIBEVOICE_MODELS = {}
     ATTENTION_MODES = ["eager"]

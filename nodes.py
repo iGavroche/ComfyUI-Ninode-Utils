@@ -463,7 +463,9 @@ try:
     from .nodes_audio import get_audio_node_mappings, get_audio_display_name_mappings
     audio_node_mappings = get_audio_node_mappings()
     audio_display_name_mappings = get_audio_display_name_mappings()
-except ImportError:
+    print("✅ Audio nodes loaded successfully")
+except Exception as e:
+    print(f"⚠️ Audio nodes import failed: {e} - continuing without audio nodes")
     audio_node_mappings = {}
     audio_display_name_mappings = {}
 
