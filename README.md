@@ -31,6 +31,27 @@ A flexible chat node that works with **any OpenAI-compatible API endpoint**, pro
 - **🎛️ Configurable Parameters** - Temperature, top_p, max_tokens, and more
 - **🛡️ Robust Error Handling** - Graceful handling of various edge cases
 
+### VibeVoice Voice Design Node
+
+A **drop-in replacement** for Minimax Voice Design node that generates custom voices from text descriptions using VibeVoice TTS. Perfect for the full-loop-Sora2-ComfyUI workflow!
+
+**Features:**
+- 🎙️ **Voice Generation from Text Descriptions** - Create custom voices based on detailed prompts
+- 🔄 **Drop-in Compatibility** - Same inputs/outputs as Minimax Voice Design node
+- 🎵 **Voice Cloning Support** - Optional reference audio for voice cloning
+- 🚀 **Local Processing** - No API keys required, runs entirely locally
+- ⚡ **High Quality** - Uses VibeVoice's advanced TTS technology
+
+#### ✨ Key Features
+
+- **🔄 Complete Input Compatibility** - Same interface as Minimax Voice Design node
+- **🎯 Text-to-Voice Generation** - Generate voices from detailed text descriptions
+- **🎵 Reference Audio Support** - Optional voice cloning with reference audio
+- **⚙️ Advanced Generation Controls** - CFG scale, inference steps, temperature, top-p
+- **🔧 Model Selection** - Choose from available VibeVoice models
+- **💾 Audio Output** - Saves generated audio as WAV files
+- **🎛️ Memory Management** - Optional model offloading for memory efficiency
+
 ## 📦 Installation
 
 ### Method 1: Git Clone (Recommended)

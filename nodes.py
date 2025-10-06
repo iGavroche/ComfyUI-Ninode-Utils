@@ -458,11 +458,22 @@ class OpenAICompatibleChatNode(ComfyNodeABC):
         return (output_text,)
 
 
+# Import audio nodes
+try:
+    from .nodes_audio import get_audio_node_mappings, get_audio_display_name_mappings
+    audio_node_mappings = get_audio_node_mappings()
+    audio_display_name_mappings = get_audio_display_name_mappings()
+except ImportError:
+    audio_node_mappings = {}
+    audio_display_name_mappings = {}
+
 # Node mappings
 NODE_CLASS_MAPPINGS = {
     "OpenAICompatibleChatNode": OpenAICompatibleChatNode,
+    **audio_node_mappings
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "OpenAICompatibleChatNode": "OpenAI Compatible Chat",
+    **audio_display_name_mappings
 }
